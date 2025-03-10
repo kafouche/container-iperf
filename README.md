@@ -1,35 +1,47 @@
-# iPerf3
+# iPerf
+
 This image is based on *Alpine Linux* latest stable image.
 
-## Image
-### Environment
-| Parameter | Description                                          |
-|-----------|------------------------------------------------------|
-| `TZ`      | Set container's timezone (*default*: `Europe/Paris`) |
+## Ports
 
-### Network Ports
-| Port      | Description                  |
-|-----------|------------------------------|
-| `5201`    | Default server tcp/udp port. |
-
-
-## Build
-```
-docker build -t kafouche/iperf3:latest .
-```
-
+| Port   | Description          |
+|--------|----------------------|
+| `5201` | Default Server Port. |
 
 ## Run
+
 The following `code blocks` are only there as **examples**.
+
 ### Manual
+
+**Docker**
+
 ```
 docker run --detach \
-    --env-file $(pwd)/.env \
-    --name iperf3 \
+    --name iperf \
     --network bridge \
-    --publish 5201:5201 \
+    --publish 5201:5201/tcp \
     --restart unless-stopped \
-    kafouche/iperf3:latest
+    ghcr.io/kafouche/iperf:latest
+```
+
+```
+docker exec --interactive --tty iperf iperf3 -c X.X.X.X
+```
+
+**Podman**
+
+```
+podman run --detach \
+    --name iperf \
+    --network bridge \
+    --publish 5201:5201/tcp \
+    --restart unless-stopped \
+    localhost/kafouche/iperf:latest
+```
+
+```
+podman exec --interactive --tty iperf iperf3 -c X.X.X.X
 ```
 
 ### Composer
@@ -38,11 +50,11 @@ docker run --detach \
 version: "3"
 
 services:
-    iperf3:
-        container_name: iperf3
-        image: "kafouche/iperf3:latest"
-        network_mode: bridge
-        ports:
-          - 5201:5201
-        restart: unless-stopped
+  owntone:
+    container_name: "iperf"
+    image: "ghcr.io/kafouche/iperf:latest"
+    network_mode: bridge
+    ports:
+      - 5201:5201/tcp
+    restart: unless-stopped
 ```
