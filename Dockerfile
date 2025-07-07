@@ -1,50 +1,20 @@
 # Dockerfile: iperf
-# iPerf Docker Image.
+# Kafouche iPerf Image.
 
-LABEL       org.opencontainers.image.source https://github.com/kafouche/iperf
-
-# BUILD STAGE
-
-FROM        ghcr.io/kafouche/alpine:latest as buildstage
-
-ARG         RELEASE=3.18
-
-            # MAKE PACKAGES
-RUN         apk --no-cache --update upgrade \
-            && apk --no-cache --update add \
-                g++ \
-                make
-
-            # DOWNLOAD SOURCE
-RUN         apk --no-cache --update add \
-                curl \
-            && curl \
-                --location ""https://github.com/esnet/iperf/archive/$RELEASE.tar.gz"" \
-                --output /tmp/iperf.tar.gz \
-            && mkdir --parents /tmp/iperf \
-            && tar --directory=/tmp/iperf --extract --file=/tmp/iperf.tar.gz --gzip --strip-components=1
-
-RUN         cd /tmp/iperf \
-            && ./configure \
-                --prefix=/usr \
-                --sysconfdir=/etc \
-                --mandir=/usr/share/man \
-                --infodir=/usr/share/info \
-                --disable-static \
-            && make \
-            && make check \
-            && make DESTDIR=/tmp/iperf/target install
-
-
-# RUN STAGE
+LABEL       org.opencontainers.image.authors="kafouche"
+LABEL       org.opencontainers.image.base.name="ghcr.io/kafouche/iperf:latest"
+LABEL       org.opencontainers.image.ref.name="ghcr.io/kafouche/alpine"
+LABEL       org.opencontainers.image.source="https://github.com/kafouche/docker-iperf"
+LABEL       org.opencontainers.image.title="iPerf3"
 
 FROM        ghcr.io/kafouche/alpine:latest
 
-RUN         apk --no-cache --update upgrade
+RUN         apk --no-cache --update upgrade \
+            && apk --no-cache --update add \
+              iperf3
 
-COPY        --from=buildstage /tmp/iperf/target/ /
-
-RUN         adduser -D -G users -h /home/iperf -s /sbin/nologin -S iperf
+RUN         addgroup -S iperf \
+            && adduser -D -G iperf -h /home/iperf -s /sbin/nologin -S iperf
 
 WORKDIR     /
 
