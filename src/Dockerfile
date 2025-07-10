@@ -9,15 +9,28 @@ LABEL       org.opencontainers.image.title="iPerf3"
 LABEL       org.opencontainers.image.version="3.19"
 LABEL       image.tags[0]="ghcr.io/kafouche/iperf:latest-src"
 
+
+# ------------------------------------------------------------------------------
+
 ARG         RELEASE=3.19
-ARG         ARCHIVE=https://github.com/esnet/iperf/archive/$RELEASE.tar.gz
+
+ARG         SOURCE_URL=https://github.com/esnet/iperf/archive/$RELEASE.tar.gz
+
+ARG         SOURCE_DIR=/tmp/source
+
+ARG         SOURCE_TAR=/tmp/archive.tar.xz
+
+ARG         TARGET_DIR=/tmp/target
+
 
 # BUILD STAGE
 
 FROM        ghcr.io/kafouche/alpine:latest as buildstage
 
-ARG         RELEASE
-ARG         ARCHIVE
+ARG         SOURCE_DIR \
+            SOURCE_TAR \
+            SOURCE_URL \
+            TARGET_DIR
 
             # MAKE PACKAGES
 RUN         apk --no-cache --update upgrade \
@@ -29,18 +42,19 @@ RUN         apk --no-cache --update upgrade \
 RUN         apk --no-cache --update add \
               curl \
             && curl \
-              --location "$ARCHIVE" \
-              --output /tmp/archive.tar.gz \
-            && mkdir --parents /tmp/archive \
+              --location "${SOURCE_URL}" \
+              --output "${SOURCE_TAR}" \
+            && mkdir --parents "${SOURCE_DIR}" \
             && tar \
-              --directory=/tmp/archive \
+              --directory="${SOURCE_DIR}" \
               --extract \
-              --file=/tmp/archive.tar.gz \
+              --file="${SOURCE_TAR}" \
               --gzip \
               --strip-components=1
 
-RUN         cd /tmp/archive \
-            && ./configure \
+WORKDIR     "${SOURCE_DIR}"
+
+RUN         ./configure \
               --prefix=/usr \
               --sysconfdir=/etc \
               --mandir=/usr/share/man \
@@ -48,19 +62,21 @@ RUN         cd /tmp/archive \
               --disable-static \
             && make \
             && make check \
-            && make DESTDIR=/tmp/install install
+            && DESTDIR="${TARGET_DIR}" make install
 
 
 # RUN STAGE
 
 FROM        ghcr.io/kafouche/alpine:latest
 
+ARG         TARGET_DIR
+
 RUN         apk --no-cache --update upgrade
 
-COPY        --from=buildstage /tmp/install/ /
+COPY        --from=buildstage "${TARGET_DIR}/" /
 
 RUN         addgroup -S iperf \
-            && adduser -D -G iperf -h /home/iperf -s /sbin/nologin -S iperf
+            && adduser -D -G iperf -h /var/lib/iperf -H -s /sbin/nologin -S iperf
 
 WORKDIR     /
 

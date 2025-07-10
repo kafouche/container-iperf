@@ -7,6 +7,9 @@ LABEL       org.opencontainers.image.ref.name="ghcr.io/kafouche/alpine"
 LABEL       org.opencontainers.image.source="https://github.com/kafouche/docker-iperf"
 LABEL       org.opencontainers.image.title="iPerf3"
 
+
+# ------------------------------------------------------------------------------
+
 FROM        ghcr.io/kafouche/alpine:latest
 
 RUN         apk --no-cache --update upgrade \
@@ -14,7 +17,7 @@ RUN         apk --no-cache --update upgrade \
               iperf3
 
 RUN         addgroup -S iperf \
-            && adduser -D -G iperf -h /home/iperf -s /sbin/nologin -S iperf
+            && adduser -D -G iperf -h /var/lib/iperf -H -s /sbin/nologin -S iperf
 
 WORKDIR     /
 
