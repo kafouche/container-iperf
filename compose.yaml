@@ -1,0 +1,8 @@
+services:
+  iperf:
+    image: ghcr.io/kafouche/iperf:latest
+    name: "iperf"
+    network_mode: bridge
+    ports:
+      - "5201:5201/tcp"
+    restart: "unless-stopped"
