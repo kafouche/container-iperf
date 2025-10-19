@@ -1,17 +1,6 @@
 # Dockerfile: iperf
 # Kafouche iPerf Image (source).
 
-LABEL       org.opencontainers.image.authors="kafouche"
-LABEL       org.opencontainers.image.base.name="ghcr.io/kafouche/iperf:3.19"
-LABEL       org.opencontainers.image.ref.name="ghcr.io/kafouche/alpine"
-LABEL       org.opencontainers.image.source="https://github.com/kafouche/docker-iperf"
-LABEL       org.opencontainers.image.title="iPerf3"
-LABEL       org.opencontainers.image.version="3.19"
-LABEL       image.tags[0]="ghcr.io/kafouche/iperf:latest-src"
-
-
-# ------------------------------------------------------------------------------
-
 ARG         RELEASE=3.19
 
 ARG         SOURCE_URL=https://github.com/esnet/iperf/archive/$RELEASE.tar.gz
@@ -68,6 +57,16 @@ RUN         ./configure \
 # RUN STAGE
 
 FROM        ghcr.io/kafouche/alpine:latest
+
+LABEL       org.opencontainers.image.authors="kafouche"
+LABEL       org.opencontainers.image.base.name="ghcr.io/kafouche/iperf:3.19"
+LABEL       org.opencontainers.image.ref.name="ghcr.io/kafouche/alpine"
+LABEL       org.opencontainers.image.source="https://github.com/kafouche/container-iperf"
+LABEL       org.opencontainers.image.title="iPerf3"
+LABEL       org.opencontainers.image.version="3.19"
+LABEL       image.tags[0]="ghcr.io/kafouche/iperf:latest-src"
+
+# ------------------------------------------------------------------------------
 
 ARG         TARGET_DIR
 
