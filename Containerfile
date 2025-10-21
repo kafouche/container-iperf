@@ -1,4 +1,4 @@
-# Dockerfile: iperf
+# Containerfile: iperf
 # Kafouche iPerf Image.
 
 FROM        ghcr.io/kafouche/alpine:latest
